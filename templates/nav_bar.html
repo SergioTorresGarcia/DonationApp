@@ -1,0 +1,12 @@
+<ul>
+  <li><a href="/giveAway" class="btn btn--without-border active">Start</a></li>
+  <li><a href="/giveAway/#steps" class="btn btn--without-border">O co chodzi?</a></li>
+  <li><a href="/giveAway/#about-us" class="btn btn--without-border">O nas</a></li>
+  <li><a href="/giveAway/#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
+    {% if user.is_authenticated %}
+        <li><a href="http://127.0.0.1:8000/giveAway/donate" class="btn btn--without-border">Przekaż dary</a></li>   {#  link pending - form #}
+    {% else %}
+        <li><a href="http://127.0.0.1:8000/giveAway/login" class="btn btn--without-border">Przekaż dary</a></li>   {#  link pending - form #}
+    {% endif %}
+    <li><a href="/giveAway/#contact" class="btn btn--without-border">Kontakt</a></li>
+</ul>
