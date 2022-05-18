@@ -1,8 +1,11 @@
+from collections import Counter
+
 from django.contrib.auth import logout, login, authenticate
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from django.views import View
 
-from accounts.forms import LoginForm, RegisterForm
+from accounts.forms import LoginForm, RegisterForm, DonationForm
 from accounts.models import Donation, Institution, Category
 
 
@@ -47,24 +50,14 @@ class Logout(View):
 
 
 class LandingPage(View):
-    """
-    Homepage view. Greets user and displays "before login" menu:
-    """
     def get(self, request):
         all_donations = Donation.objects.all()
-        all_institutions = Institution.objects.all()
-        total_bags_given = 0
-        institutions_helped = []
-        nr_inst_helped = 0
-        for donation in all_donations:
-            total_bags_given += int(donation.quantity)
-            if donation.institution_id not in institutions_helped:
-                institutions_helped.append(donation.institution_id)
-                nr_inst_helped += 1
+        total_bags_given = sum(all_donations.values_list('quantity', flat=True))
+        nr_inst_helped = Donation.objects.aggregate(Count('institution',distinct=True)).get('institution__count')
+
         ctx = {
             'total_bags_given': total_bags_given,
             'nr_inst_helped': nr_inst_helped,
-            'all_institutions': all_institutions,
         }
         return render(request, 'index.html', ctx)
 
@@ -74,31 +67,21 @@ class AddDonation(View):
     Displays form to guide user through the process (4x JS slides)
     """
     def get(self, request):
+        form = DonationForm()
         all_categories = Category.objects.all()
-        all_donations = Donation.objects.all()
         all_institutions = Institution.objects.all()
-        current_donation = all_donations[0]
-
         return render(request, 'form.html', {
+            'form': form,
             'all_categories': all_categories,
             'all_institutions': all_institutions,
-            'all_donations': all_donations,
-
         })
 
-    def post(self, request):  # forms.py (validacja)
-        Donation.objects.create(
-            quantity = request.POST['bags'],
-            # category = request.POST['categories'], < M2M - osobno
-            # address = request.POST['address'],
-            phone_number = request.POST['phone'],
-            city = request.POST['city'],
-            zip_code = request.POST['postcode'],
-            pick_up_date = request.POST['date'],
-            pick_up_time = request.POST['time'],
-            pick_up_comment = request.POST['more_info'],
-            institution = request.POST['organization'],
-            user = request.user
-        )
-        return render(request, 'form-confirmation.html')
+    def post(self, request):
+        form = DonationForm(request.POST)
+        if form.is_valid():
+            donation = form.save() #commit=False)
+            donation.set_category(form.cleaned_data['categories']), #< M2M - osobno
+            donation.save()
+            return render(request, 'form-confirmation.html')
+        return render(request, 'form.html', {'form': form})
 

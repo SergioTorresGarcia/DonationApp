@@ -237,11 +237,9 @@ document.addEventListener("DOMContentLoaded", function() {
       // TODO: get data from inputs and show them in summary
 
       let bags = document.getElementById("bags");
-      // let cat = document.getElementById("categories");
       document.querySelector("#bags2").innerText = bags.value
-      // document.querySelector("#bags2").innerText = bags.value; //+ ' worki z: ' + cat.value;
       let organization = document.getElementById("organization");
-      document.querySelector("#organization2").innerText = organization.value;
+      document.querySelector("#organization2").innerText = organization.value; // not working... what's "on"?
 
       let address = document.getElementById("address");
       document.querySelector("#address2").innerText = address.value;
@@ -258,7 +256,6 @@ document.addEventListener("DOMContentLoaded", function() {
       document.querySelector("#time2").innerText = time.value;
       let comment = document.getElementById("info");
       document.querySelector("#info2").innerText = comment.value;
-
     }
 
     /**
@@ -271,24 +268,23 @@ document.addEventListener("DOMContentLoaded", function() {
       this.currentStep++;
       this.updateForm();
       // fetch(zbiera info i wysyła do backend pod adres gdzie POST) class FormData w JS
-      fetch('/donate/', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-    };
+      // fetch('/donate/', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-type': 'application/json',
+      //   },
+      //   body: JSON.stringify(data),
+      // })
+      // .then(response => response.json())
+      // .then(data => {
+      //   console.log('Success:', data);
+      // })
+      // .catch((error) => {
+      //   console.error('Error:', error);
+      // });
+    }
   }
-
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
