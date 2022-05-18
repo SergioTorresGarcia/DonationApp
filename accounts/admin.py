@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 # Register your models here.
 
 
-class CustomUserAdmin(UserAdmin):
+class AccountAdmin(UserAdmin):
     """Define admin model for custom User model with no username field."""
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -26,4 +26,4 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
 
 
-admin.site.register(get_user_model(), CustomUserAdmin)
+admin.site.register(get_user_model(), AccountAdmin)

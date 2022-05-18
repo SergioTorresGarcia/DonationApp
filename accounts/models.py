@@ -1,3 +1,4 @@
+
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils import timezone
@@ -6,8 +7,7 @@ from django.utils.translation import gettext_lazy as _
 # Create your models here.
 
 
-
-class CustomUserManager(BaseUserManager):
+class AccountManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
 
     def _create_user(self, email, password=None, **extra_fields):
@@ -38,14 +38,14 @@ class CustomUserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractUser):
+class Account(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    objects = CustomUserManager()
+    objects = AccountManager()
 
 
 class Category(models.Model):
@@ -79,14 +79,14 @@ class Donation(models.Model):
     quantity = models.IntegerField()
     category = models.ManyToManyField(Category)
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    address = models.CharField(max_length=64), models.IntegerField()
+    address = models.CharField(max_length=64)
     phone_number = models.CharField(max_length=20)
     city = models.CharField(max_length=20)
     zip_code = models.IntegerField()
     pick_up_date = models.DateField()
     pick_up_time = models.TimeField(default=timezone.now)
-    pick_up_comment = models.TextField()
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True)
+    pick_up_comment = models.TextField(default='Brak uwag')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.user

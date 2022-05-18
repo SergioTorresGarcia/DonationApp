@@ -1,55 +1,43 @@
 from django.contrib.auth import logout, login, authenticate
 from django.shortcuts import render, redirect
-
-# Create your views here.
-from django.utils.datastructures import MultiValueDictKeyError
 from django.views import View
 
-from accounts.forms import UserAdminCreationForm
-from accounts.models import Donation, Institution, CustomUser, Category
+from accounts.forms import LoginForm, RegisterForm
+from accounts.models import Donation, Institution, Category
 
 
-class Register(View):
+class RegisterView(View):
     def get(self, request):
-        return render(request, 'register.html')
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form})
 
     def post(self, request):
-        name = request.POST['name']
-        surname = request.POST['surname']
-        email = request.POST['email']
-        password1 = request.POST['password1']
-        password2 = request.POST['password2']
-        try:
-            if password1 == password2:
-                user = CustomUser.objects.create(first_name=name, last_name=surname, email=email, password=password1)
-                login(request, user)
-                redirect_url = request.GET.get('next', '/')
-                return redirect(redirect_url)
-            else:
-                error = "Passwords don't match"
-                return render(request, 'register.html', {'error': error})
-        except MultiValueDictKeyError:
-            error = "Something went wrong, try again"
-            return render(request, 'register.html', {'error': error})
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data.get('password'))
+            user.save()
+            return redirect('login')
+        return render(request, 'register.html', {'form': form})
 
 
-class Login(View):
+class LoginView(View):
     def get(self, request):
-        return render(request, 'registration/login.html')
+        form = LoginForm()
+        return render(request, 'registration/login.html', {'form': form})
 
     def post(self, request):
-        email = request.POST['email']
-        password = request.POST['password']
-
-        try:
-            user = CustomUser.objects.get(email=email, password=password)
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
             if user:
                 login(request, user)
                 redirect_url = request.GET.get('next', '/')
                 return redirect(redirect_url)
-        except Exception:
-            error = "Email and password don't match"
-            return render(request, 'registration/login.html', {'error':error})
+        error = "Podany login lub hasło jest nieprawidłowe !"
+        return render(request, 'registration/login.html', {'form': form, 'error': error})
 
 
 class Logout(View):
@@ -87,8 +75,30 @@ class AddDonation(View):
     """
     def get(self, request):
         all_categories = Category.objects.all()
+        all_donations = Donation.objects.all()
         all_institutions = Institution.objects.all()
+        current_donation = all_donations[0]
+
         return render(request, 'form.html', {
             'all_categories': all_categories,
-            'all_institutions': all_institutions
+            'all_institutions': all_institutions,
+            'all_donations': all_donations,
+
         })
+
+    def post(self, request):  # forms.py (validacja)
+        Donation.objects.create(
+            quantity = request.POST['bags'],
+            # category = request.POST['categories'], < M2M - osobno
+            # address = request.POST['address'],
+            phone_number = request.POST['phone'],
+            city = request.POST['city'],
+            zip_code = request.POST['postcode'],
+            pick_up_date = request.POST['date'],
+            pick_up_time = request.POST['time'],
+            pick_up_comment = request.POST['more_info'],
+            institution = request.POST['organization'],
+            user = request.user
+        )
+        return render(request, 'form-confirmation.html')
+
