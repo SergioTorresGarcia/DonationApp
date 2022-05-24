@@ -236,26 +236,29 @@ document.addEventListener("DOMContentLoaded", function() {
 
       // TODO: get data from inputs and show them in summary
 
-      let bags = document.getElementById("bags");
-      document.querySelector("#bags2").innerText = bags.value
-      let organization = document.getElementById("organization");
-      document.querySelector("#organization2").innerText = organization.value; // not working... what's "on"?
+      if (this.currentStep == 5) {
+        let bags = document.getElementById("bags");
+        document.querySelector("#bags2").innerText = bags.value
 
-      let address = document.getElementById("address");
-      document.querySelector("#address2").innerText = address.value;
-      let city = document.getElementById("city");
-      document.querySelector("#city2").innerText = city.value;
-      let postcode = document.getElementById("postcode");
-      document.querySelector("#postcode2").innerText = postcode.value;
-      let phone = document.getElementById("phone");
-      document.querySelector("#phone2").innerText = phone.value;
+        let organization = document.querySelector("input[id='institution']:checked");
+        document.getElementById("organization2").innerText = organization.name;
 
-      let date = document.getElementById("date");
-      document.querySelector("#date2").innerText = date.value;
-      let time = document.getElementById("time");
-      document.querySelector("#time2").innerText = time.value;
-      let comment = document.getElementById("info");
-      document.querySelector("#info2").innerText = comment.value;
+        let address = document.getElementById("address");
+        document.querySelector("#address2").innerText = address.value;
+        let city = document.getElementById("city");
+        document.querySelector("#city2").innerText = city.value;
+        let postcode = document.getElementById("postcode");
+        document.querySelector("#postcode2").innerText = postcode.value;
+        let phone = document.getElementById("phone");
+        document.querySelector("#phone2").innerText = phone.value;
+
+        let date = document.getElementById("date");
+        document.querySelector("#date2").innerText = date.value;
+        let time = document.getElementById("time");
+        document.querySelector("#time2").innerText = time.value;
+        let comment = document.getElementById("info");
+        document.querySelector("#info2").innerText = comment.value;
+      }
     }
 
     /**
@@ -267,22 +270,38 @@ document.addEventListener("DOMContentLoaded", function() {
       e.preventDefault();
       this.currentStep++;
       this.updateForm();
-      // fetch(zbiera info i wysyła do backend pod adres gdzie POST) class FormData w JS
-      // fetch('/donate/', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Accept': 'application/json',
-      //     'Content-type': 'application/json',
-      //   },
-      //   body: JSON.stringify(data),
-      // })
-      // .then(response => response.json())
-      // .then(data => {
-      //   console.log('Success:', data);
-      // })
-      // .catch((error) => {
-      //   console.error('Error:', error);
-      // });
+
+      let data = new FormData(document.getElementById("donationform"))
+
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+      }
+      let csrftoken = getCookie('csrftoken');
+
+      let response = fetch("/giveAway/donate/", {
+          method: 'POST',
+          body: data,
+          // headers: { "X-CSRFToken": csrftoken },
+          credentials: "same-origin",
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
     }
   }
   const form = document.querySelector(".form--steps");

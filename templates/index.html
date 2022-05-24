@@ -9,14 +9,20 @@
                 <li class="logged-user">
                 Witaj {{ user.first_name }}
                 <ul class="dropdown">
-                  <li><a href="#">Profil</a></li>
+                  {% if user.is_superuser %}
+                    <li><a href="{%  url 'user' %}">Profil</a></li>
+                    <li><a href="/admin/">Panel administracyjny</a></li>
+
+                {% else %}
+                    <li><a href="{%  url 'user' %}">Profil</a></li>
+                {% endif %}
                   <li><a href="#">Ustawienia</a></li>
-                  <li><a href="logout/">Wyloguj</a></li>
+                  <li><a href="{% url 'logout' %}">Wyloguj</a></li>
                 </ul>
                 </li>
             {% else %}
-                <li><a href="http://127.0.0.1:8000/giveAway/login" class="btn btn--small btn--without-border">Zaloguj</a></li>
-                <li><a href="http://127.0.0.1:8000/giveAway/register" class="btn btn--small btn--highlighted">Załóż konto</a></li>
+                <li><a href="{%  url 'login' %}" class="btn btn--small btn--without-border">Zaloguj</a></li>
+                <li><a href="{%  url 'register' %}" class="btn btn--small btn--highlighted">Załóż konto</a></li>
             {% endif %}
         </ul>
         {% include 'nav_bar.html' %}
@@ -75,7 +81,7 @@
         </div>
       </div>
         {% if not user.is_authenticated %}
-            <a href="http://127.0.0.1:8000/giveAway/register" class="btn btn--large">Załóż konto</a>
+            <a href="{%  url 'register' %}" class="btn btn--large">Załóż konto</a>
         {% endif %}
     </section>
 

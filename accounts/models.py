@@ -1,6 +1,7 @@
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -79,14 +80,18 @@ class Donation(models.Model):
     quantity = models.IntegerField()
     categories = models.ManyToManyField('Category') #, related_name="institutions"
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
-    address = models.CharField(max_length=64)
     phone_number = models.IntegerField()
+    address = models.CharField(max_length=64)
     city = models.CharField(max_length=20)
     zip_code = models.IntegerField()
-    pick_up_date = models.DateField()
-    pick_up_time = models.TimeField() #(default=timezone.now)
+    pick_up_date = models.DateField(auto_now = True)  #format('%d-%m-%Y')
+    pick_up_time = models.TimeField(auto_now=False) #(default=timezone.now)
     pick_up_comment = models.TextField(default='Brak uwag')
     user = models.ForeignKey(Account, on_delete=models.CASCADE, null=True)
+    is_taken = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user
+
+    def get_absolute_url(self):
+        return reverse('user-detail', args=(self.id,))
