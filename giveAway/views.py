@@ -21,10 +21,17 @@ class RegisterView(View):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data.get('password'))
-            user.save()
-            return redirect('login')
-        return render(request, 'register.html', {'form': form})
+            password = form.cleaned_data['password']
+            password2 = form.cleaned_data['password2']
+            user.set_password(password)
+            user.set_password(password2)
+
+            if password == password2:
+                user.save()
+                return redirect('login')
+
+        error = "Hasła się nie zgadzają"
+        return render(request, 'register.html', {'form': form, 'error': error})
 
 
 class LoginView(View):
@@ -88,17 +95,23 @@ class AddDonation(View):
 
     def post(self, request):
         form = DonationForm(request.POST)
-        # breakpoint()
+
         if form.is_valid():
+            # breakpoint()
             donation = form.save(commit=False)
             donation.user = request.user
             donation.save()
-            return redirect('confirmation')
+            form.save_m2m()
+            # redirect_url = request.GET.get('next', 'confirmation')
+            # return redirect(redirect_url)
 
+            return redirect('confirmation')
+            # return redirect('http://127.0.0.1:8000/giveAway/confirmation/')
+            # return render(request, 'form-confirmation.html', {'form': form})
+            # user = request.user
+            # return render(request, 'form-confirmation.html', {'user': user})
 
         return render(request, 'form.html', {'form': form})
-
-
 
 
 class UserView(View):

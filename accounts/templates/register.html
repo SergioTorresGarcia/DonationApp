@@ -1,9 +1,3 @@
-{#<form method="POST">#}
-{#    {% csrf_token %}#}
-{#    {{ form.as_p }}#}
-{#    <input type="submit" value="Submit">#}
-{#</form>#}
-
 {% extends 'base.html' %}
 {% load static %}
 
@@ -24,7 +18,6 @@
 
       <h2>Załóż konto</h2>
         <label style="color: darkred">{{ error }}</label>
-
       <form method="post">
           {% csrf_token %}
         <div class="form-group">

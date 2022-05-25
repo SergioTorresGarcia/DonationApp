@@ -237,6 +237,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // TODO: get data from inputs and show them in summary
 
       if (this.currentStep == 5) {
+
         let bags = document.getElementById("bags");
         document.querySelector("#bags2").innerText = bags.value
 
@@ -304,6 +305,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   }
+
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);

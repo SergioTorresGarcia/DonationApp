@@ -73,7 +73,7 @@
         <div class="form--steps-container">
             <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-            <form id="donationform" method="post">
+            <form id="donationform" method="post" action="/giveAway/donate/confirmation/">
 
                 <!-- STEP 1: class .active is switching steps -->
                 <div data-step="1" class="active">
@@ -82,7 +82,7 @@
                     {% for category in all_categories %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input type="checkbox" id="categories" name="categories" value="categories" />
+                <input type="checkbox" id="categories" name="categories" value="{{ category.pk }}" />
                 <span class="checkbox"></span>
                 <span class="description">{{ category.name }}</span>
               </label>
@@ -241,9 +241,9 @@
                     <div class="form-group form-group--buttons">
 
                         <button type="button" class="btn prev-step">Wstecz</button>
-                        <form method="post" action="{% url 'confirmation' %}">
+{#                        <form method="post" action="{% url 'confirmation' %}">#}
                             <button type="submit" class="btn">Potwierdzam</button>
-                        </form>
+{#                        </form>#}
 
                     </div>
                 </div>
