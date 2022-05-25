@@ -240,23 +240,23 @@ document.addEventListener("DOMContentLoaded", function() {
         let bags = document.getElementById("bags");
         document.querySelector("#bags2").innerText = bags.value
 
-        let organization = document.querySelector("input[id='institution']:checked");
-        document.getElementById("organization2").innerText = organization.name;
+        let organization = document.querySelector("input[name='institution']:checked");
+        document.getElementById("organization2").innerText = organization.id;
 
         let address = document.getElementById("address");
         document.querySelector("#address2").innerText = address.value;
         let city = document.getElementById("city");
         document.querySelector("#city2").innerText = city.value;
-        let postcode = document.getElementById("postcode");
+        let postcode = document.getElementById("zip_code");
         document.querySelector("#postcode2").innerText = postcode.value;
-        let phone = document.getElementById("phone");
+        let phone = document.getElementById("phone_number");
         document.querySelector("#phone2").innerText = phone.value;
 
-        let date = document.getElementById("date");
+        let date = document.getElementById("pick_up_date");
         document.querySelector("#date2").innerText = date.value;
-        let time = document.getElementById("time");
+        let time = document.getElementById("pick_up_time");
         document.querySelector("#time2").innerText = time.value;
-        let comment = document.getElementById("info");
+        let comment = document.getElementById("pick_up_comment");
         document.querySelector("#info2").innerText = comment.value;
       }
     }

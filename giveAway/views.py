@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import TemplateView
 
-from accounts.forms import LoginForm, RegisterForm, DonationModelForm
+from accounts.forms import LoginForm, RegisterForm, DonationForm
 from accounts.models import Donation, Institution, Category
 
 
@@ -87,13 +87,14 @@ class AddDonation(View):
         })
 
     def post(self, request):
-        form = DonationModelForm(request.POST) #DonationForm
+        form = DonationForm(request.POST)
+        # breakpoint()
         if form.is_valid():
             donation = form.save(commit=False)
             donation.user = request.user
             donation.save()
             return redirect('confirmation')
-            breakpoint()
+
 
         return render(request, 'form.html', {'form': form})
 
@@ -110,6 +111,7 @@ class UserView(View):
         user = request.user
         user_donations = Donation.objects.filter(user=user)
         return render(request, 'user.html', {'user_donations': user_donations})
+
 
 class UserDetailView(View):
     def get(self, request, donation_id):

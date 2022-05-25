@@ -118,7 +118,7 @@
                     {% for institution in all_institutions %}
                         <div class="form-group form-group--checkbox">
                             <label>
-                                <input type="radio" id="institution" name="{{ institution.name }}" value="{{ institution.id }}"/>{# value="{{ institution.id }}" #}
+                                <input type="radio" id="{{ institution.name }}" name="institution" value="{{ institution.id }}"/>{# value="{{ institution.id }}" #}
                                 <span class="checkbox radio"></span>
                                 <span class="description">
                           <div class="title">{{ institution.name }}</div>
@@ -155,13 +155,13 @@
 
                   <div class="form-group form-group--inline">
                       <label>
-                          Kod pocztowy <input type="text" name="postcode" id="postcode"/>
+                          Kod pocztowy <input type="text" name="zip_code" id="zip_code"/>
                       </label>
                   </div>
 
                   <div class="form-group form-group--inline">
                       <label>
-                          Numer telefonu <input type="number" name="phone" id="phone"/>
+                          Numer telefonu <input type="number" name="phone_number" id="phone_number"/>
                       </label>
                   </div>
               </div>
@@ -170,17 +170,17 @@
                             <h4>Termin odbioru</h4>
 
                             <div class="form-group form-group--inline">
-                                <label> Data <input type="date" name="date" id="date"/></label>
+                                <label> Data <input type="date" name="pick_up_date" id="pick_up_date"/></label>
                             </div>
 
                             <div class="form-group form-group--inline">
-                                <label> Godzina <input type="time" name="time" id="time"/></label>
+                                <label> Godzina <input type="time" name="pick_up_time" id="pick_up_time"/></label>
                             </div>
 
                             <div class="form-group form-group--inline">
                                 <label>
                                     Uwagi dla kuriera
-                                    <textarea name="more_info" id="info" rows="5"></textarea>
+                                    <textarea name="pick_up_comment" id="pick_up_comment" rows="5"></textarea>
                                 </label>
                             </div>
                         </div>
@@ -241,7 +241,9 @@
                     <div class="form-group form-group--buttons">
 
                         <button type="button" class="btn prev-step">Wstecz</button>
-                        <button type="submit" class="btn">Potwierdzam</button>
+                        <form method="post" action="{% url 'confirmation' %}">
+                            <button type="submit" class="btn">Potwierdzam</button>
+                        </form>
 
                     </div>
                 </div>
