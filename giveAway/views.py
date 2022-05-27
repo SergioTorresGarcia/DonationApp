@@ -1,10 +1,10 @@
-from collections import Counter
-
 from django.contrib.auth import logout, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
 from django.views.generic import TemplateView
 
@@ -25,11 +25,9 @@ class RegisterView(View):
             password2 = form.cleaned_data['password2']
             user.set_password(password)
             user.set_password(password2)
-
             if password == password2:
                 user.save()
                 return redirect('login')
-
         error = "Hasła się nie zgadzają"
         return render(request, 'register.html', {'form': form, 'error': error})
 
@@ -60,31 +58,27 @@ class Logout(View):
 
 
 class LandingPage(View):
+    """
+    Displays home page:
+        - total of donations
+        - nr. of institutions that have recieved donations
+        - all info about the app
+    """
     def get(self, request):
         all_donations = Donation.objects.all()
         total_bags_given = sum(all_donations.values_list('quantity', flat=True))
         nr_inst_helped = Donation.objects.aggregate(Count('institution',distinct=True)).get('institution__count')
         all_institutions = Institution.objects.all()
-
         ctx = {
             'total_bags_given': total_bags_given,
             'nr_inst_helped': nr_inst_helped,
             'all_institutions': all_institutions
-
         }
         return render(request, 'index.html', ctx)
 
 
-class ConfirmationView(View):
-    def get(self, request):
-        user = request.user
-        return render(request, 'form-confirmation.html', {'user': user})
-
-
 class AddDonation(View):
-    """
-    Displays form to guide user through the process (4x JS slides)
-    """
+    """ Displays form to guide user through the process (4x JS slides) """
     def get(self, request):
         all_categories = Category.objects.all()
         all_institutions = Institution.objects.all()
@@ -95,35 +89,60 @@ class AddDonation(View):
 
     def post(self, request):
         form = DonationForm(request.POST)
-
         if form.is_valid():
-            # breakpoint()
             donation = form.save(commit=False)
             donation.user = request.user
             donation.save()
             form.save_m2m()
-            # redirect_url = request.GET.get('next', 'confirmation')
-            # return redirect(redirect_url)
+            return JsonResponse({'url': reverse('giveAway:confirmation')})  # we get response from JS not django!
+        return JsonResponse({'url': reverse('giveAway:donate')})
 
-            return redirect('confirmation')
-            # return redirect('http://127.0.0.1:8000/giveAway/confirmation/')
-            # return render(request, 'form-confirmation.html', {'form': form})
-            # user = request.user
-            # return render(request, 'form-confirmation.html', {'user': user})
 
-        return render(request, 'form.html', {'form': form})
+class ConfirmationView(View):
+    def get(self, request):
+        user = request.user
+        return render(request, 'form-confirmation.html', {'user': user})
 
 
 class UserView(View):
     def get(self, request):
         user = request.user
         user_donations = Donation.objects.filter(user=user)
-        return render(request, 'user.html', {'user_donations': user_donations })
-
-    def post(self, request):
-        user = request.user
-        user_donations = Donation.objects.filter(user=user)
         return render(request, 'user.html', {'user_donations': user_donations})
+
+
+# class UpdateProfileView(View):
+#     def get(self, request, user_id):
+#         args = {}
+#
+#         if request.method == 'POST':
+#             actual_user = Account.objects.get(pk=user_id)
+#             form = UpdateProfile(request.POST, instance=request.user)
+#             form.actual_user = request.user
+#             if form.is_valid():
+#                 form.save()
+#                 return HttpResponseRedirect(reverse('user'))
+#         else:
+#             form = UpdateProfile()
+#
+#         args['form'] = form
+#         return render(request, 'register.html', args)
+
+
+# class EditUserView(View):
+#     def get(self, request, user_id):
+#         form = UpdateProfile(RegisterForm)
+#         user = request.user
+#         user_donations = Donation.objects.filter(user=user)
+#         user_to_update = Account.objects.get(pk=user_id)
+#         # user_to_update.is_taken = True
+#         # user_to_update.save()
+#         return render(request, 'user.html', {'user_donations': user_donations })
+#
+#     def post(self, request):
+#         user = request.user
+#         user_donations = Donation.objects.filter(user=user)
+#         return render(request, 'user.html', {'user_donations': user_donations})
 
 
 class UserDetailView(View):
@@ -133,7 +152,10 @@ class UserDetailView(View):
         donation_to_update = Donation.objects.get(pk=donation_id)
         donation_to_update.is_taken = True
         donation_to_update.save()
-        return render(request, 'user.html', {'donation_to_update': donation_to_update, 'user_donations': user_donations})
+        return render(request, 'user.html', {
+            'donation_to_update': donation_to_update,
+            'user_donations': user_donations
+        })
 
 
 @method_decorator(login_required, name='dispatch')

@@ -4,65 +4,66 @@
 {% block content %}
 
     <header>
-    <nav class="container container--70">
-        <ul class="nav--actions">
-            <li class="logged-user">
-                Witaj {{ user.first_name }}
-                <ul class="dropdown">
-                    {% if user.is_superuser %}
-                        <li><a href="{% url 'user' %}">Profil</a></li>
-                        <li><a href="/admin/">Panel administracyjny</a></li>
-                    {% else %}
-                        <li><a href="{% url 'user' %}">Profil</a></li>
-                    {% endif %}
-                    <li><a href="#">Ustawienia</a></li>
-                    <li><a href="{% url "logout" %}">Wyloguj</a></li>
-                </ul>
-            </li>
-        </ul>
-        {% include 'nav_bar.html' %}
-    </nav>
+        <nav class="container container--70">
+            <ul class="nav--actions">
+                <li class="logged-user">
+                    Witaj {{ user.first_name }}
+                    <ul class="dropdown">
+                        {% if user.is_superuser %}
+                            <li><a href="{% url 'giveAway:user' %}">Profil</a></li>
+                            <li><a href="/admin/">Panel administracyjny</a></li>
+                        {% else %}
+                            <li><a href="{% url 'giveAway:user' %}">Profil</a></li>
+                        {% endif %}
+                        <li><a href="#">Ustawienia</a></li>
+                        <li><a href="{% url "giveAway:logout" %}">Wyloguj</a></li>
+                    </ul>
+                </li>
+            </ul>
+            {% include 'nav_bar.html' %}
+        </nav>
 
-    <section class="form--steps">
-        <div class="form--steps-container">
-            <div style="font-size: small">
-                Imię i nazwisko oraz email: <h3>{{ user.first_name }} {{ user.last_name }} | {{ user.email }}<br><br></h3>
-                Lista przekazanych przez Ciebie darów:
+        <section class="form--steps">
+            <div class="form--steps-container">
+                <div style="font-size: small">
+                    Imię i nazwisko oraz email:
+                    <h3>{{ user.first_name }} {{ user.last_name }} | {{ user.email }}<br><br></h3>
+                    Lista przekazanych przez Ciebie darów:
                     {% for donation in user_donations %}
                         {% if donation.is_taken == False %}
-                                <p class="summary" style="font-size: large">
+                            <p class="summary" style="font-size: large">
                                 <label>  - Kiedy: {{ donation.pick_up_date }} o godz. {{ donation.pick_up_time }}</label>
                                 <br><label>  - Ilość worków: {{ donation.quantity }}</label>
                                 <br><label>  - Zawartość: {{ donation.institution.category.get_queryset|join:", " }}</label>
                                 <br><label>  - Odbiorca: {{ donation.institution.get_type_display }} "{{ donation.institution }}"</label><br>
-                                </p>
-                                Czy dar został już zabrany?<br><br>
-                                <form method="get" action="/giveAway/user/{{ donation.id }}/">
-                                    <button type="submit" style="color: darkolivegreen">"Tak, został już zabrany"</button>
-                                </form><br><br>
+                            </p>
+                            Czy dar został już zabrany?<br><br>
+                            <form method="get" action="/giveAway/user/{{ donation.id }}/">
+                                <button type="submit" style="color: darkolivegreen">"Tak, został już zabrany"</button>
+                            </form><br><br>
+
+                            {# TO DO: pagination #}
+
                         {% endif %}
                     {% endfor %}
-                <br><br>_____________________________________________<br><br>
-                Dary które zostały już zabrane (archiwum):
+                    <br><br>_____________________________________________<br><br>
+                    Dary które zostały już zabrane (archiwum):
                     {% for donation in user_donations %}
                         {% if donation.is_taken == True %}
                             <p  class="summary" style="color:lightslategray; font-size: small">
-
-                            <label>- Kiedy: {{ donation.pick_up_date }} o godz. {{ donation.pick_up_time }}</label>
-                            <br><label>- Ilość worków: {{ donation.quantity }}</label>
-                            <br><label>- Zawartość: {{ donation.institution.category.get_queryset|join:", " }}</label>
-                            <br><label>- Odbiorca: {{ donation.institution.get_type_display }} "{{ donation.institution }}"</label><br>
+                                <label>- Kiedy: {{ donation.pick_up_date }} o godz. {{ donation.pick_up_time }}</label>
+                                <br><label>- Ilość worków: {{ donation.quantity }}</label>
+                                <br><label>- Zawartość: {{ donation.institution.category.get_queryset|join:", " }}</label>
+                                <br><label>- Odbiorca: {{ donation.institution.get_type_display }} "{{ donation.institution }}"</label><br>
                             </p>
+
+                            {# TO DO: pagination or button to display 'archive' #}
+
                         {% endif %}
                     {% endfor %}
+                </div>
             </div>
-        </div>
-    </section>
-
+        </section>
     </header>
 
 {% endblock %}
-
-
-
-

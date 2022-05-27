@@ -4,9 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from .models import Institution, Donation
 
-
 # Register your models here.
-
 
 class AccountAdmin(UserAdmin):
     """Define admin model for custom User model with no username field."""

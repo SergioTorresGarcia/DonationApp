@@ -27,4 +27,5 @@ urlpatterns = [
 
     path('giveAway/', include('giveAway.urls')),
     path('', RedirectView.as_view(url='giveAway/'))
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
